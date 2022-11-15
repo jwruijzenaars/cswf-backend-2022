@@ -28,7 +28,6 @@ cache:
 # Deploy to Heroku
 #
 Deployment:
-  type: deploy
   stage: deploy
   image: ruby:latest
   script:

@@ -1,32 +1,33 @@
-import { Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put, Req, Inject } from '@nestjs/common';
 import { GameService } from './game.service';
+import { Game } from './game.schema';
 
-@Controller()
+@Controller('games')
 export class GameController {
-    constructor(private readonly appService: GameService) { }
+    constructor(private readonly gameService: GameService) { }
 
     @Get()
-    getGames() {
-        return this.appService.getGames();
+    async getGames(): Promise<Game[]> {
+        return await this.gameService.getGames();
     }
 
     @Get(':id')
-    getGame(@Param() params) {
-        return this.appService.getGame(params.id);
+    async getGame(@Param() params): Promise<Game> {
+        return await this.gameService.getGame(params.id);
     }
 
     @Post()
-    createGame(@Req() req) {
-        return this.appService.createGame(req.body);
+    async createGame(@Req() req) {
+        return await this.gameService.createGame(req.body);
     }
 
     @Put(':id')
-    updateGame(@Param() params, @Req() req) {
-        return this.appService.updateGame(params.id, req.body);
+    async updateGame(@Param() params, @Req() req): Promise<Game> {
+        return await this.gameService.updateGame(params.id, req.body);
     }
 
     @Delete(':id')
-    deleteGame(@Param() params) {
-        return this.appService.deleteGame(params.id);
+    async deleteGame(@Param() params): Promise<Game> {
+        return await this.gameService.deleteGame(params.id);
     }
 }

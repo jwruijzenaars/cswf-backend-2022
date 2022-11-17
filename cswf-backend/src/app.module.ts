@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { GameController } from './games/game.controller';
-import { GameService } from './games/game.service';
+import { ConfigModule } from '@nestjs/config';
+import { GameModule } from './games/game.module';
+import { MongooseModule } from '@nestjs/mongoose';
+ConfigModule.forRoot();
 
 @Module({
-  imports: [],
-  controllers: [AppController, GameController],
-  providers: [AppService, GameService],
+  imports: [GameModule, MongooseModule.forRoot('mongodb+srv://user:wachtwoord123@mist.kedrtal.mongodb.net/?retryWrites=true&w=majority')],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule { }

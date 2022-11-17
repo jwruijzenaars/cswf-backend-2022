@@ -1,67 +1,49 @@
-import { Injectable } from '@nestjs/common';
-import * as mongoose from 'mongoose';
-import Game from './game';
+import { Injectable, Scope } from '@nestjs/common';
+import { Model } from 'mongoose';
+import { Game } from './game.schema';
+import { InjectModel } from '@nestjs/mongoose';
 
-@Injectable()
+
+@Injectable({ scope: Scope.DEFAULT })
 export class GameService {
-    getGames() {
+    constructor(@InjectModel('Game') private gameModel: Model<Game>) { };
+    async getGames(): Promise<Game[]> {
         console.log('getGames called');
-        Game.find({}, (err, games) => {
-            if (err) {
-                console.log(err);
-                return err;
-            } else {
-                return games;
-            }
+        return await this.gameModel.find({}).then((res) => {
+            console.log('games found: ', res);
+            return res;
         });
-    }
+    };
 
-    getGame(id: string) {
+    async getGame(id: string): Promise<Game> {
         console.log('getGame called');
-        Game.findOne({ _id: id }, (err, game) => {
-            if (err) {
-                console.log(err);
-                return err;
-            } else {
-                return game;
-            }
-        })
-    }
+        return this.gameModel.findOne({ _id: id }).then((res) => {
+            console.log('game found: ', res);
+            return res;
+        });
+    };
 
-    createGame(newGame) {
+    async createGame(newGame): Promise<Game> {
         console.log('createGame called');
-        const game = new Game(newGame);
-        game.save((err, game) => {
-            if (err) {
-                console.log(err);
-                return err;
-            } else {
-                return game;
-            }
+        return this.gameModel.create(newGame).then((res) => {
+            console.log('game created: ', res);
+            return res;
         });
-    }
+    };
 
-    updateGame(id: string, updatedGame) {
+    async updateGame(id: string, updatedGame): Promise<Game> {
         console.log('updateGame called');
-        Game.findOneAndUpdate({ _id: id }, updatedGame).exec((err, game) => {
-            if (err) {
-                console.log(err);
-                return err;
-            } else {
-                return game;
-            }
+        return this.gameModel.findOneAndUpdate({ _id: id }, updatedGame).then((res) => {
+            console.log('game updated: ', res);
+            return res;
         });
-    }
+    };
 
-    deleteGame(id: string) {
+    async deleteGame(id: string): Promise<Game> {
         console.log('deleteGame called');
-        Game.findOneAndDelete({ _id: id }).exec((err, game) => {
-            if (err) {
-                console.log(err);
-                return err;
-            } else {
-                return game;
-            }
+        return this.gameModel.findOneAndDelete({ _id: id }).then((res) => {
+            console.log('game deleted: ', res);
+            return res;
         });
-    }
-}
+    };
+};

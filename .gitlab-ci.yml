@@ -41,4 +41,4 @@ Deployment:
     - gem install dpl
     - dpl --provider=heroku --app=$HEROKU_APP_NAME --api-key=$HEROKU_API_KEY
   only:
-    - master
+    - main

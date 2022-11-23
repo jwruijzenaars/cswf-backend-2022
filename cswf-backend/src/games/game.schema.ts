@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
+import { Developer } from 'src/developers/developer.schema';
 
 export type GameDocument = HydratedDocument<Game>;
 
@@ -32,8 +33,8 @@ export class Game {
     @Prop()
     releasedBy: string;
 
-    @Prop()
-    developer: string;
+    @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Developer' }], required: true })
+    developer: Developer;
 
     @Prop()
     reviews: string[];

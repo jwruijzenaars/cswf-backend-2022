@@ -24,7 +24,7 @@ export class DeveloperService {
         });
     };
 
-    async createDeveloper(newDeveloper): Promise<Developer> {
+    async createDeveloper(newDeveloper: Developer): Promise<Developer> {
         console.log('createDeveloper called, ' + newDeveloper);
         return this.developerModel.create(newDeveloper).then((res) => {
             console.log('developer created: ', res);
@@ -32,7 +32,7 @@ export class DeveloperService {
         });
     };
 
-    async updateDeveloper(id: string, updatedDeveloper): Promise<Developer> {
+    async updateDeveloper(id: string, updatedDeveloper: Developer): Promise<Developer> {
         console.log('updateDeveloper called');
         return this.developerModel.findOneAndUpdate({ _id: id }, updatedDeveloper).then((res) => {
             console.log('developer updated: ', res);

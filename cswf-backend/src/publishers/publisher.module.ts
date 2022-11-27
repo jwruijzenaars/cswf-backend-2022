@@ -11,4 +11,4 @@ import { PublisherService } from './publisher.service';
     providers: [PublisherService],
     exports: [PublisherService],
 })
-export class DeveloperModule { }
+export class PublisherModule { }

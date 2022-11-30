@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
+import { Game } from 'src/games/game.schema';
 
 export type PublisherDocument = HydratedDocument<Publisher>;
 
@@ -13,6 +14,9 @@ export class Publisher {
 
     @Prop()
     foundedOn: Date;
+
+    @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }] })
+    gamesPublished: Game[];
 }
 
 export const PublisherSchema = SchemaFactory.createForClass(Publisher);

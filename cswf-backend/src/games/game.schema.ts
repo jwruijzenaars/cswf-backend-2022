@@ -31,14 +31,14 @@ export class Game {
     @Prop()
     ageRating: number;
 
-    @Prop()
-    releasedBy: string;
+    @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Publisher' }], required: true })
+    releasedBy: Publisher;
 
     @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Developer' }], required: true })
     developer: Developer;
 
-    @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Publisher' }], required: true })
-    reviews: Publisher;
+    @Prop()
+    reviews: string[];
 
 }
 

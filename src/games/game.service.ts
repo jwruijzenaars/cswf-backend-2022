@@ -10,7 +10,6 @@ export class GameService {
     async getGames(): Promise<Game[]> {
         console.log('getGames called');
         return await this.gameModel.find({}).then((res) => {
-            console.log('games found: ', res);
             return res;
         });
     };

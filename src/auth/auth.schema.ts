@@ -28,11 +28,15 @@ export class Auth {
     @Prop({ type: Object })
     reviews: [{
         game: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }];
+        userId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Auth' }];
         review: string;
     }];
 
     @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Auth' }] })
     friends: Auth[];
+
+    @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Auth' }] })
+    friendRequests: Auth[];
 
 }
 

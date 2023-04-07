@@ -10,13 +10,11 @@ export class AuthController {
     @Post('login')
     async login(@Req() req): Promise<any> {
         var user = await this.authService.login(req.body);
-
         if (user) {
             return user;
         } else {
             return Promise.reject('login failed');
         }
-
     }
 
     @Post('register')
@@ -34,11 +32,16 @@ export class AuthController {
         return await this.authService.getAuth(params.id);
     }
 
-    @Put('user/:id')
-    async addToOwnedGames(@Param() params, @Req() req): Promise<any> {
-        console.log('addToOwnedGames called');
+    @Get('user')
+    async getAllAuths(): Promise<any> {
+        return await this.authService.getAllAuths();
+    }
+
+    @Put('user/update/:id')
+    async updateAuth(@Param() params, @Req() req): Promise<any> {
+        console.log('updateAuth called');
         console.log('params: ', params);
         console.log('req.body: ', req.body);
-        return await this.authService.addToOwnedGames(params.id, req.body);
+        return await this.authService.updateAuth(params.id, req.body);
     }
 }

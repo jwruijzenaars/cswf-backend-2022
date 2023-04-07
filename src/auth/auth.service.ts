@@ -7,6 +7,7 @@ import * as jwt from 'jsonwebtoken';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class AuthService {
+
     jwtSecret = 'secret';
     constructor(@InjectModel(Auth.name) private authModel: Model<Auth>) { };
 
@@ -33,6 +34,7 @@ export class AuthService {
                 ownedGames: auth.ownedGames,
                 reviews: auth.reviews,
                 friends: auth.friends,
+                friendRequests: auth.friendRequests,
             };
             console.log(newUser);
             return newUser;
@@ -42,19 +44,44 @@ export class AuthService {
         }
     };
 
-    async register(body: Auth): Promise<Auth> {
+    async register(body: any): Promise<any> {
         console.log('register called');
-        await this.authModel.findOne({ email: body.email }).then((res) => {
-            var response = {
-                status: 400,
-                error: 'user already exists',
+        var possibleProblem = await this.authModel.findOne({ email: body.newUser.email })
+        console.log('possibleProblem: ');
+        console.log(possibleProblem);
+        if (possibleProblem != null || possibleProblem != undefined) {
+            console.log('user already exists');
+            return Promise.reject('user already exists');
+        } else {
+            var newUser = {
+                userName: body.newUser.userName,
+                email: body.newUser.email,
+                password: body.newUser.password,
+                wishlist: [],
+                recommended: [],
+                ownedGames: [],
+                reviews: [],
+                friends: [],
+                friendRequests: [],
             };
-            return Promise.reject(response);
-        });
-        return await this.authModel.create(body).then((res) => {
-            console.log('register successful');
-            return res;
-        });
+            var createdUser = await this.authModel.create(newUser);
+            var payload = {
+                _id: createdUser._id,
+            }
+            return {
+                _id: createdUser._id,
+                token: jwt.sign(payload, this.jwtSecret, { expiresIn: '2h' }),
+                email: createdUser.email,
+                password: createdUser.password,
+                userName: createdUser.userName,
+                wishlist: createdUser.wishlist,
+                recommended: createdUser.recommended,
+                ownedGames: createdUser.ownedGames,
+                reviews: createdUser.reviews,
+                friends: createdUser.friends,
+                friendRequests: createdUser.friendRequests,
+            }
+        }
     }
 
     async validate(body: Auth): Promise<Auth> {
@@ -78,11 +105,17 @@ export class AuthService {
         });
     }
 
-    async addToOwnedGames(id: string, user: any): Promise<Auth> {
-        console.log('addToOwnedGames called');
-        console.log(user.email);
-        return this.authModel.findOneAndUpdate({ _id: id }, user).then((res) => {
-            console.log('addToOwnedGames successful: ', res);
+    async getAllAuths(): Promise<Auth[]> {
+        console.log('getAllAuths called');
+        return this.authModel.find({}).then((res) => {
+            return res;
+        });
+    }
+
+    async updateAuth(id: string, user: any): Promise<Auth> {
+        console.log('updateUser called');
+        return await this.authModel.findOneAndUpdate({ _id: id }, user, { returnDocument: "after" }).then((res) => {
+            console.log('updateUser successful: ', res);
             return res;
         });
     }

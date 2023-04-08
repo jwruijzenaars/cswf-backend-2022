@@ -44,4 +44,9 @@ export class AuthController {
         console.log('req.body: ', req.body);
         return await this.authService.updateAuth(params.id, req.body);
     }
+
+    @Post('validatetoken')
+    async validateToken(@Req() req): Promise<any> {
+        return await this.authService.validateToken(req.body.token);
+    }
 }

@@ -120,4 +120,17 @@ export class AuthService {
         });
     }
 
+    async validateToken(token: string): Promise<any> {
+        console.log('validateToken called');
+        return jwt.verify(token, this.jwtSecret, (err, decoded) => {
+            if (err) {
+                console.log('validateToken failed');
+                return false;
+            } else {
+                console.log('validateToken successful');
+                return true;
+            }
+        });
+    }
+
 };

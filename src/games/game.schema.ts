@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Auth } from 'src/auth/auth.schema';
 import { Developer } from 'src/developers/developer.schema';
 import { Publisher } from 'src/publishers/publisher.schema';
 
@@ -40,9 +39,6 @@ export class Game {
 
     @Prop()
     reviews: string[];
-
-    @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Auth' }], required: true })
-    createdByUser: Auth;
 
 }
 

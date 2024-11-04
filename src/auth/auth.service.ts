@@ -46,8 +46,9 @@ export class AuthService {
     async register(body: any): Promise<any> {
         console.log('register called');
         var possibleProblem = await this.authModel.findOne({ email: body.newUser.email })
-        console.log('possibleProblem: ');
-        console.log(possibleProblem);
+
+        // Add neo4j query for adding user here pls.
+
         if (possibleProblem != null || possibleProblem != undefined) {
             console.log('user already exists');
             return Promise.reject('user already exists');
@@ -98,6 +99,9 @@ export class AuthService {
 
     async getAuth(id: string): Promise<Auth> {
         console.log('getAuth called');
+
+        // Add neo4j query for getting user here pls.
+
         return this.authModel.findOne({ _id: id }).then((res) => {
             console.log('auth found: ', res);
             return res;
@@ -106,6 +110,9 @@ export class AuthService {
 
     async getAllAuths(): Promise<Auth[]> {
         console.log('getAllAuths called');
+
+        // Add neo4j query for getting all users here pls.
+
         return this.authModel.find({}).then((res) => {
             return res;
         });
@@ -113,6 +120,9 @@ export class AuthService {
 
     async updateAuth(id: string, user: any): Promise<Auth> {
         console.log('updateUser called');
+
+        // Add neo4j query for updating user here pls.
+
         return await this.authModel.findOneAndUpdate({ _id: id }, user, { returnDocument: "after" }).then((res) => {
             console.log('updateUser successful: ', res);
             return res;

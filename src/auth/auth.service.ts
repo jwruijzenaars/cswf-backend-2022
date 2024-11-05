@@ -3,13 +3,14 @@ import { Model } from 'mongoose';
 import { Auth } from './auth.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import * as jwt from 'jsonwebtoken';
+import { Neo4jService } from 'src/neo4j/neo4j.service';
 
 
 @Injectable({ scope: Scope.DEFAULT })
 export class AuthService {
 
     jwtSecret = 'secret';
-    constructor(@InjectModel(Auth.name) private authModel: Model<Auth>) { };
+    constructor(@InjectModel(Auth.name) private authModel: Model<Auth>, private neo4jService: Neo4jService) { };
 
     async login(body: any): Promise<any> {
         console.log('login called');
@@ -47,8 +48,6 @@ export class AuthService {
         console.log('register called');
         var possibleProblem = await this.authModel.findOne({ email: body.newUser.email })
 
-        // Add neo4j query for adding user here pls.
-
         if (possibleProblem != null || possibleProblem != undefined) {
             console.log('user already exists');
             return Promise.reject('user already exists');
@@ -68,6 +67,22 @@ export class AuthService {
             var payload = {
                 _id: createdUser._id,
             }
+
+            this.neo4jService.runQuery(
+                `CREATE (a:User {id: $id, email: $email, userName: $userName, password: $password, wishlist: $wishlist, recommended: $recommended, ownedGames: $ownedGames, reviews: $reviews, friends: $friends, friendRequests: $friendRequests}) RETURN a`,
+                {
+                    id: createdUser._id,
+                    email: createdUser.email,
+                    userName: createdUser.userName,
+                    password: createdUser.password,
+                    wishlist: createdUser.wishlist,
+                    recommended: createdUser.recommended,
+                    ownedGames: createdUser.ownedGames,
+                    reviews: createdUser.reviews,
+                    friends: createdUser.friends,
+                    friendRequests: createdUser.friendRequests,
+                }
+            );
             return {
                 _id: createdUser._id,
                 token: jwt.sign(payload, this.jwtSecret, { expiresIn: '2h' }),
@@ -100,8 +115,6 @@ export class AuthService {
     async getAuth(id: string): Promise<Auth> {
         console.log('getAuth called');
 
-        // Add neo4j query for getting user here pls.
-
         return this.authModel.findOne({ _id: id }).then((res) => {
             console.log('auth found: ', res);
             return res;
@@ -111,8 +124,6 @@ export class AuthService {
     async getAllAuths(): Promise<Auth[]> {
         console.log('getAllAuths called');
 
-        // Add neo4j query for getting all users here pls.
-
         return this.authModel.find({}).then((res) => {
             return res;
         });
@@ -121,7 +132,21 @@ export class AuthService {
     async updateAuth(id: string, user: any): Promise<Auth> {
         console.log('updateUser called');
 
-        // Add neo4j query for updating user here pls.
+        this.neo4jService.runQuery(
+            `MATCH (a:User {id: $id}) SET a += {email: $email, userName: $userName, password: $password, wishlist: $wishlist, recommended: $recommended, ownedGames: $ownedGames, reviews: $reviews, friends: $friends, friendRequests: $friendRequests} RETURN a`,
+            {
+                id: id,
+                email: user.email,
+                userName: user.userName,
+                password: user.password,
+                wishlist: user.wishlist,
+                recommended: user.recommended,
+                ownedGames: user.ownedGames,
+                reviews: user.reviews,
+                friends: user.friends,
+                friendRequests: user.friendRequests,
+            }
+        );
 
         return await this.authModel.findOneAndUpdate({ _id: id }, user, { returnDocument: "after" }).then((res) => {
             console.log('updateUser successful: ', res);

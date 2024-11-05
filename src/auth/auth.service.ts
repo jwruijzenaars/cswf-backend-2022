@@ -167,4 +167,8 @@ export class AuthService {
         });
     }
 
+    getFriendsWishlist(id: any, friendId: any): any {
+        throw new Error('Method not implemented.');
+    }
+
 };

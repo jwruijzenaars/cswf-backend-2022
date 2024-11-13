@@ -1,7 +1,5 @@
 import { Controller, Delete, Get, Param, Post, Put, Req, Inject, Res } from '@nestjs/common';
 import { UserService } from './user.service';
-import { get } from 'http';
-
 
 @Controller('user')
 export class UserController {
@@ -35,6 +33,11 @@ export class UserController {
     @Get(':id/friendswishlist/:friendId')
     async getFriendsWishlist(@Param() params): Promise<any> {
         return await this.userService.getFriendsWishlist(params.id, params.friendId);
+    }
+
+    @Get(':id/allfriendswishlist')
+    async getAllFriendsWishlist(@Param() params): Promise<any> {
+        return await this.userService.getAllFriendsWishlist(params.id);
     }
 
     @Delete(':id/removefriend/:friendId')

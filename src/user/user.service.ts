@@ -14,8 +14,23 @@ export class UserService {
         @InjectModel(Game.name) private gameModel: Model<Game>,
         private neo4jService: Neo4jService) { };
 
-    getFriendsWishlist(id: any, friendId: any): any {
-        throw new Error('Method not implemented.');
+    getFriendsWishlist(id: string, friendId: string): any {
+        return this.neo4jService.runQuery(
+            `MATCH (a:User {id: $id})-[r:FRIENDS]->(b:User {id: $friendId}) RETURN b.wishlist`,
+            {
+                id: id,
+                friendId: friendId,
+            }
+        );
+    }
+
+    getAllFriendsWishlist(id: string): any {
+        return this.neo4jService.runQuery(
+            `MATCH (a:User {id: $id})-[r:FRIENDS]->(b:User) RETURN b.wishlist`,
+            {
+                id: id,
+            }
+        );
     }
 
     async addFriendRequest(id: string, friendId: string): Promise<Auth> {

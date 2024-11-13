@@ -3,6 +3,7 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { Auth } from 'src/auth/auth.schema';
 import { Developer } from 'src/developers/developer.schema';
 import { Publisher } from 'src/publishers/publisher.schema';
+import { Review } from './review.schema';
 
 export type GameDocument = HydratedDocument<Game>;
 
@@ -39,7 +40,7 @@ export class Game {
     developer: Developer;
 
     @Prop()
-    reviews: string[];
+    reviews: Review[];
 
     @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Auth' }], required: true })
     createdByUser: Auth;

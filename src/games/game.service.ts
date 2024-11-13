@@ -2,6 +2,7 @@ import { Injectable, Scope } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { Game } from './game.schema';
 import { InjectModel } from '@nestjs/mongoose';
+import { Review } from './review.schema';
 
 
 @Injectable({ scope: Scope.DEFAULT })
@@ -45,4 +46,12 @@ export class GameService {
             return res;
         });
     };
+
+    async addReview(id: string, review: Review): Promise<Game> {
+        console.log('addReview called');
+        return this.gameModel.findOneAndUpdate({ _id: id }, { $push: { reviews: review } }).then((res) => {
+            console.log('review added: ', res);
+            return res;
+        });
+    }
 };

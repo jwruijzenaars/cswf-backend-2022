@@ -48,9 +48,4 @@ export class AuthController {
     async validateToken(@Req() req): Promise<any> {
         return await this.authService.validateToken(req.body.token);
     }
-
-    @Get('user/:id/friendswishlist/:friendId')
-    async getFriendsWishlist(@Param() params): Promise<any> {
-        return await this.authService.getFriendsWishlist(params.id, params.friendId);
-    }
 }

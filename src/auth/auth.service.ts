@@ -5,7 +5,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as jwt from 'jsonwebtoken';
 import { Neo4jService } from 'src/neo4j/neo4j.service';
 
-
 @Injectable({ scope: Scope.DEFAULT })
 export class AuthService {
 
@@ -166,9 +165,4 @@ export class AuthService {
             }
         });
     }
-
-    getFriendsWishlist(id: any, friendId: any): any {
-        throw new Error('Method not implemented.');
-    }
-
 };

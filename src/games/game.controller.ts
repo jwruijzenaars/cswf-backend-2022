@@ -30,4 +30,11 @@ export class GameController {
     async deleteGame(@Param() params): Promise<Game> {
         return await this.gameService.deleteGame(params.id);
     }
+
+    @Post(':id/review')
+    async addReview(@Param() params, @Req() req) {
+        // Also add review to user, call authService here
+
+        return await this.gameService.addReview(params.id, req.body);
+    }
 }

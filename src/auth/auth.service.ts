@@ -4,6 +4,7 @@ import { Auth } from './auth.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import * as jwt from 'jsonwebtoken';
 import { Neo4jService } from 'src/neo4j/neo4j.service';
+import { JwtPayload } from 'jsonwebtoken';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class AuthService {
@@ -98,19 +99,6 @@ export class AuthService {
         }
     }
 
-    async validate(body: Auth): Promise<Auth> {
-        console.log('validate called');
-        return await this.authModel.find({}).then((res) => {
-            res.forEach((auth) => {
-                if (auth.email === body.email && auth.password === body.password) {
-                    console.log('validate successful');
-                    return auth
-                }
-            });
-            return Promise.reject('validate failed');
-        });
-    }
-
     async getAuth(id: string): Promise<Auth> {
         console.log('getAuth called');
 
@@ -128,8 +116,16 @@ export class AuthService {
         });
     }
 
-    async updateAuth(id: string, user: any): Promise<Auth> {
+    async updateAuth(id: string, user: any, token: string): Promise<Auth> {
         console.log('updateUser called');
+
+        this.authModel.findById(id).then((res) => {
+            jwt.verify(token, this.jwtSecret, (err, decoded) => {
+                if (err || !(decoded as JwtPayload)._id || (decoded as JwtPayload)._id != id) {
+                    return Promise.reject('unauthorized');
+                }
+            });
+        });
 
         this.neo4jService.runQuery(
             `MATCH (a:User {id: $id}) SET a += {email: $email, userName: $userName, password: $password, wishlist: $wishlist, recommended: $recommended, ownedGames: $ownedGames, reviews: $reviews, friends: $friends, friendRequests: $friendRequests} RETURN a`,

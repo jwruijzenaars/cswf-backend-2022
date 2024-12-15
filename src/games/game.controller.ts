@@ -1,10 +1,12 @@
-import { Controller, Delete, Get, Param, Post, Put, Req, Inject } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put, Req, Inject, UseGuards } from '@nestjs/common';
 import { GameService } from './game.service';
 import { Game } from './game.schema';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { UserService } from 'src/user/user.service';
 
 @Controller('games')
 export class GameController {
-    constructor(private readonly gameService: GameService) { }
+    constructor(private readonly gameService: GameService, private readonly userService: UserService) { }
 
     @Get()
     async getGames(): Promise<Game[]> {
@@ -17,24 +19,30 @@ export class GameController {
     }
 
     @Post()
+    @UseGuards(AuthGuard)
     async createGame(@Req() req) {
         return await this.gameService.createGame(req.body);
     }
 
     @Put(':id')
+    @UseGuards(AuthGuard)
     async updateGame(@Param() params, @Req() req): Promise<Game> {
-        return await this.gameService.updateGame(params.id, req.body);
+        try {
+            return await this.gameService.updateGame(params.id, req.body);
+        } catch (error) {
+            return error;
+        }
     }
 
     @Delete(':id')
+    @UseGuards(AuthGuard)
     async deleteGame(@Param() params): Promise<Game> {
         return await this.gameService.deleteGame(params.id);
     }
 
     @Post(':id/review')
+    @UseGuards(AuthGuard)
     async addReview(@Param() params, @Req() req) {
-        // Also add review to user, call authService here
-
-        return await this.gameService.addReview(params.id, req.body);
+        return await this.userService.addReview(params.id, req.body, params.gameId);
     }
 }

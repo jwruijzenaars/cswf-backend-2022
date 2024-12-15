@@ -14,23 +14,30 @@ export class UserService {
         @InjectModel(Game.name) private gameModel: Model<Game>,
         private neo4jService: Neo4jService) { };
 
-    getFriendsWishlist(id: string, friendId: string): any {
-        return this.neo4jService.runQuery(
+    async getFriendsWishlist(id: string, friendId: string): Promise<any> {
+        const wishlistIds = await this.neo4jService.runQuery(
             `MATCH (a:User {id: $id})-[r:FRIENDS]->(b:User {id: $friendId}) RETURN b.wishlist`,
             {
                 id: id,
                 friendId: friendId,
             }
-        );
+        ) as any;
+
+        return this.gameModel.find({ _id: { $in: wishlistIds['b.wishlist'] } });
     }
 
-    getAllFriendsWishlist(id: string): any {
-        return this.neo4jService.runQuery(
+    async getAllFriendsWishlist(id: string): Promise<any> {
+        const allUsersWishlists = await this.neo4jService.runQuery(
             `MATCH (a:User {id: $id})-[r:FRIENDS]->(b:User) RETURN b.wishlist`,
             {
                 id: id,
             }
         );
+        let allWishlists = [];
+        allUsersWishlists.forEach(async (wishlistIds: { [x: string]: any; }) => {
+            allWishlists.push(await this.gameModel.find({ _id: { $in: wishlistIds['b.wishlist'] } }));
+        });
+        return allWishlists;
     }
 
     async addFriendRequest(id: string, friendId: string): Promise<Auth> {
@@ -210,18 +217,14 @@ export class UserService {
 
     async getOwnedGames(id: string): Promise<Game[]> {
         console.log('getOwnedGames called');
-        return this.authModel.findOne({ _id: id }).then((res) => {
-            console.log('owned games found: ', res.ownedGames);
-            return res.ownedGames;
-        });
+        const user = await this.authModel.findOne({ _id: id });
+        return this.gameModel.find({ _id: { $in: user.ownedGames } });
     }
 
     async getRecommendedGames(id: string): Promise<Game[]> {
         console.log('getRecommendedGames called');
-        return this.authModel.findOne({ _id: id }).then((res) => {
-            console.log('recommended games found: ', res.recommended);
-            return res.recommended;
-        });
+        const user = await this.authModel.findOne({ _id: id });
+        return this.gameModel.find({ _id: { $in: user.recommended } });
     }
 
     async getFriendRequests(id: string): Promise<Auth[]> {
@@ -234,10 +237,12 @@ export class UserService {
 
     async getFriends(id: string): Promise<Auth[]> {
         console.log('getFriends called');
-        return this.authModel.findOne({ _id: id }).then((res) => {
-            console.log('friends found: ', res.friends);
-            return res.friends;
-        });
+        return this.neo4jService.runQuery(
+            `MATCH (a:User {id: $id})-[r:FRIENDS]->(b:User) RETURN b`,
+            {
+                id: id,
+            }
+        );
     }
 
     async getReviews(id: string): Promise<Review[]> {
@@ -247,4 +252,29 @@ export class UserService {
             return res.reviews;
         });
     }
+
+    async addWishlist(id: string, gameId: string): Promise<Auth> {
+        console.log('addWishlist called');
+        return this.authModel.findOneAndUpdate({ _id: id }, { $push: { wishlist: gameId } }).then((res) => {
+            console.log('wishlist added: ', res);
+
+            this.neo4jService.runQuery(
+                `MATCH (a:User {id: $id}), (b:Game {id: $gameId}) CREATE (a)-[r:WISHLISTED]->(b) RETURN r`,
+                {
+                    id: id,
+                    gameId: gameId,
+                }
+            );
+
+            return res;
+        });
+    }
+
+    async getWishlist(id: string): Promise<Game[]> {
+        console.log('getWishlist called');
+        const user = await this.authModel.findOne({ _id: id });
+        return this.gameModel.find({ _id: { $in: user.wishlist } });
+    }
 };
+
+

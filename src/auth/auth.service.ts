@@ -46,16 +46,16 @@ export class AuthService {
 
     async register(body: any): Promise<any> {
         console.log('register called');
-        var possibleProblem = await this.authModel.findOne({ email: body.newUser.email })
+        var possibleProblem = await this.authModel.findOne({ email: body.email })
 
         if (possibleProblem != null || possibleProblem != undefined) {
             console.log('user already exists');
             return Promise.reject('user already exists');
         } else {
             var newUser = {
-                userName: body.newUser.userName,
-                email: body.newUser.email,
-                password: body.newUser.password,
+                userName: body.userName,
+                email: body.email,
+                password: body.password,
                 wishlist: [],
                 recommended: [],
                 ownedGames: [],
@@ -68,21 +68,16 @@ export class AuthService {
                 _id: createdUser._id,
             }
 
-            this.neo4jService.runQuery(
-                `CREATE (a:User {id: $id, email: $email, userName: $userName, password: $password, wishlist: $wishlist, recommended: $recommended, ownedGames: $ownedGames, reviews: $reviews, friends: $friends, friendRequests: $friendRequests}) RETURN a`,
+            await this.neo4jService.runQuery(
+                `CREATE (a:User {id: $id, email: $email, userName: $userName, password: $password}) RETURN a`,
                 {
-                    id: createdUser._id,
+                    id: createdUser._id.toString(),
                     email: createdUser.email,
                     userName: createdUser.userName,
                     password: createdUser.password,
-                    wishlist: createdUser.wishlist,
-                    recommended: createdUser.recommended,
-                    ownedGames: createdUser.ownedGames,
-                    reviews: createdUser.reviews,
-                    friends: createdUser.friends,
-                    friendRequests: createdUser.friendRequests,
                 }
             );
+
             return {
                 _id: createdUser._id,
                 token: jwt.sign(payload, this.jwtSecret, { expiresIn: '2h' }),
@@ -128,18 +123,12 @@ export class AuthService {
         });
 
         this.neo4jService.runQuery(
-            `MATCH (a:User {id: $id}) SET a += {email: $email, userName: $userName, password: $password, wishlist: $wishlist, recommended: $recommended, ownedGames: $ownedGames, reviews: $reviews, friends: $friends, friendRequests: $friendRequests} RETURN a`,
+            `MATCH (a:User {id: $id}) SET a += {email: $email, userName: $userName, password: $password} RETURN a`,
             {
                 id: id,
                 email: user.email,
                 userName: user.userName,
                 password: user.password,
-                wishlist: user.wishlist,
-                recommended: user.recommended,
-                ownedGames: user.ownedGames,
-                reviews: user.reviews,
-                friends: user.friends,
-                friendRequests: user.friendRequests,
             }
         );
 

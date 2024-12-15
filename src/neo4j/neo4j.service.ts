@@ -11,7 +11,7 @@ export class Neo4jService {
     this.driver = driver;
   }
 
-  async runQuery(query: string, params: Record<string, any> = {}): Promise<any> {
+  async runQuery(query: string, params: Record<string, any>): Promise<any> {
     const session: Session = this.driver.session();
 
     try {

@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Game } from 'src/games/game.schema';
+import { Review } from 'src/games/review.schema';
 
 export type AuthDocument = HydratedDocument<Auth>;
 
@@ -26,11 +27,7 @@ export class Auth {
     recommended: Game[];
 
     @Prop({ type: Object })
-    reviews: [{
-        game: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }];
-        userId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Auth' }];
-        review: string;
-    }];
+    reviews: Review[];
 
     @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Auth' }] })
     friends: Auth[];

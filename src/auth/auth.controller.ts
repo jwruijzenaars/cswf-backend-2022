@@ -1,6 +1,6 @@
-import { Controller, Delete, Get, Param, Post, Put, Req, Inject, Res } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put, Req, Inject, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -21,27 +21,25 @@ export class AuthController {
         return await this.authService.register(req.body);
     }
 
-    @Post('validate')
-    async validateAuth(@Req() req): Promise<any> {
-        return await this.authService.validate(req);
-    }
-
     @Get('user/:id')
+    @UseGuards(AuthGuard)
     async getAuth(@Param() params): Promise<any> {
         return await this.authService.getAuth(params.id);
     }
 
     @Get('user')
+    @UseGuards(AuthGuard)
     async getAllAuths(): Promise<any> {
         return await this.authService.getAllAuths();
     }
 
     @Put('user/update/:id')
+    @UseGuards(AuthGuard)
     async updateAuth(@Param() params, @Req() req): Promise<any> {
         console.log('updateAuth called');
         console.log('params: ', params);
         console.log('req.body: ', req.body);
-        return await this.authService.updateAuth(params.id, req.body);
+        return await this.authService.updateAuth(params.id, req.body, req.body.token);
     }
 
     @Post('validatetoken')

@@ -8,6 +8,7 @@ import { DeveloperModule } from './developers/developer.module';
 import { PublisherModule } from './publishers/publisher.module';
 import { AuthModule } from './auth/auth.module';
 import { Neo4jModule } from './neo4j/neo4j.module';
+import { UserModule } from './user/user.module';
 ConfigModule.forRoot();
 
 @Module({
@@ -17,7 +18,8 @@ ConfigModule.forRoot();
     DeveloperModule,
     PublisherModule,
     MongooseModule.forRoot(process.env.MONGODB_URI),
-    Neo4jModule],
+    Neo4jModule,
+    UserModule],
   controllers: [AppController],
   providers: [AppService],
 })
